@@ -1,4 +1,3 @@
-#pragma once
 #include "OS-ImGui.h"
 
 /****************************************************
@@ -10,7 +9,7 @@
 * @date			: 2023/9/17	11:25
 ****************************************************/
 
-// OS-ImGui Draw »æÖÆ¹¦ÄÜ
+// OS-ImGui Draw ï¿½ï¿½ï¿½Æ¹ï¿½ï¿½ï¿½
 namespace OSImGui
 {
     void OSImGui::Text(std::string Text, Vec2 Pos, ImColor Color, float FontSize, bool KeepCenter)
@@ -117,7 +116,7 @@ namespace OSImGui
         ImGui::InvisibleButton(str_id, ImVec2(Width, Height));
         if (ImGui::IsItemClicked())
             *v = !(*v);
-        // ×é¼þÒÆ¶¯¶¯»­
+        // ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½
         float t = *v ? 1.0f : 0.f;
         ImGuiContext& g = *GImGui;
         float AnimationSpeed = 0.08f;
@@ -126,13 +125,13 @@ namespace OSImGui
             float T_Animation = ImSaturate(g.LastActiveIdTimer / AnimationSpeed);
             t = *v ? (T_Animation) : (1.0f - T_Animation);
         }
-        // Êó±êÐüÍ£ÑÕÉ«
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½É«
         ImU32 Color;
         if (ImGui::IsItemHovered())
             Color = ImGui::GetColorU32(ImLerp(ImVec4(0.85f, 0.24f, 0.15f, 1.0f), ImVec4(0.55f, 0.85f, 0.13f, 1.000f), t));
         else
             Color = ImGui::GetColorU32(ImLerp(ImVec4(0.90f, 0.29f, 0.20f, 1.0f), ImVec4(0.60f, 0.90f, 0.18f, 1.000f), t));
-        // ×é¼þ»æÖÆ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         DrawList->AddRectFilled(ImVec2(p.x, p.y), ImVec2(p.x + Width, p.y + Height), Color, Height);
         DrawList->AddCircleFilled(ImVec2(p.x + Radius + t * (Width - Radius * 2) + (t == 0 ? 2 : -2), p.y + Radius + 2), Radius, IM_COL32(255, 255, 255, 255), 360);
         DrawList->AddCircle(ImVec2(p.x + Radius + t * (Width - Radius * 2) + (t == 0 ? 2 : -2), p.y + Radius + 2), Radius, IM_COL32(20, 20, 20, 80), 360, 1);
@@ -152,7 +151,7 @@ namespace OSImGui
         ImGui::InvisibleButton(str_id, ImVec2(Width, Height));
         if (ImGui::IsItemClicked())
             *v = !(*v);
-        // ×é¼þÒÆ¶¯¶¯»­
+        // ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½
         float t = *v ? 1.0f : 0.f;
         ImGuiContext& g = *GImGui;
         float AnimationSpeed = 0.15f;
@@ -161,13 +160,13 @@ namespace OSImGui
             float T_Animation = ImSaturate(g.LastActiveIdTimer / AnimationSpeed);
             t = *v ? (T_Animation) : (1.0f - T_Animation);
         }
-        // Êó±êÐüÍ£ÑÕÉ«
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½É«
         ImU32 Color;
         if (ImGui::IsItemHovered())
             Color = ImGui::GetColorU32(ImLerp(ImVec4(0.08f, 0.18f, 0.21f, 1.0f), ImVec4(0.10f, 0.48f, 0.68f, 1.000f), t));
         else
             Color = ImGui::GetColorU32(ImLerp(ImVec4(0.12f, 0.22f, 0.25f, 1.0f), ImVec4(0.14f, 0.52f, 0.72f, 1.000f), t));
-        // ×é¼þ»æÖÆ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         DrawList->AddRectFilled(ImVec2(p.x, p.y), ImVec2(p.x + Width, p.y + Height), Color, 360);
         DrawList->AddCircleFilled(ImVec2(p.x + Radius + 2 + t * (Width - (Radius + 2) * 2), p.y + Radius + 2), Radius + 2, IM_COL32(255, 255, 255, 255), 360);
         DrawList->AddCircleFilled(ImVec2(p.x + Radius + t * (Width - Radius * 2) + (t == 0 ? 2 : -2), p.y + Radius + 2), Radius, IM_COL32(230, 230, 230, 255), 360);
@@ -190,7 +189,7 @@ namespace OSImGui
 
         if (ImGui::IsItemClicked())
             *v = !(*v);
-        // ×é¼þÒÆ¶¯¶¯»­
+        // ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½
         float t = *v ? 1.0f : 0.f;
         ImGuiContext& g = *GImGui;
         float AnimationSpeed = 0.12f;
@@ -199,7 +198,7 @@ namespace OSImGui
             float T_Animation = ImSaturate(g.LastActiveIdTimer / AnimationSpeed);
             t = *v ? (T_Animation) : (1.0f - T_Animation);
         }
-        // Êó±êÐüÍ£ÑÕÉ«
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½É«
         ImU32 Color;
         ImU32 TickColor1, TickColor2;
         if (ImGui::IsItemHovered())
@@ -212,12 +211,12 @@ namespace OSImGui
 
         float Size = Width;
         float Scale = (float)(Size) / 20.0f;
-        // µ×É«
+        // ï¿½ï¿½É«
         DrawList->AddRectFilled(ImVec2(p.x, p.y), ImVec2(p.x + Width, p.y + Height), Color, 5, 15);
-        // Ñ¡ÖÐ¹´
+        // Ñ¡ï¿½Ð¹ï¿½
         DrawList->AddLine(ImVec2(p.x + 3 * Scale, p.y + Size / 2 - 2 * Scale), ImVec2(p.x + Size / 2 - 1 * Scale, p.y + Size - 5 * Scale), TickColor1, 3 * Scale);
         DrawList->AddLine(ImVec2(p.x + Size - 3 * Scale - 1, p.y + 3 * Scale + 1), ImVec2(p.x + Size / 2 - 1 * Scale, p.y + Size - 5 * Scale), TickColor1, 3 * Scale);
-        // Î´Ñ¡ÖÐ¹´
+        // Î´Ñ¡ï¿½Ð¹ï¿½
         DrawList->AddLine(ImVec2(p.x + 3 * Scale, p.y + Size / 2 - 2 * Scale), ImVec2(p.x + Size / 2 - 1 * Scale, p.y + Size - 5 * Scale), TickColor2, 3 * Scale);
         DrawList->AddLine(ImVec2(p.x + Size - 3 * Scale - 1, p.y + 3 * Scale + 1), ImVec2(p.x + Size / 2 - 1 * Scale, p.y + Size - 5 * Scale), TickColor2, 3 * Scale);
         ImGui::SameLine();
@@ -234,7 +233,7 @@ namespace OSImGui
 
         if (ImGui::IsItemClicked())
             *v = !(*v);
-        // ×é¼þ¶¯»­
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         float t = *v ? 1.0f : 0.f;
         ImGuiContext& g = *GImGui;
         float AnimationSpeed = 0.12f;

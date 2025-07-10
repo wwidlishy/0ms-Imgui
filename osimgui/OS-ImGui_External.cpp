@@ -211,7 +211,7 @@ bool DesktopCaptureAndDrawToImGui(ID3D11Device* device, ID3D11DeviceContext* con
     Microsoft::WRL::ComPtr<IDXGIResource> desktopRes;
 
     // Use a small timeout (e.g., 5 ms) to avoid blocking long
-    HRESULT hr = desktopDupl->AcquireNextFrame(1, &frameInfo, &desktopRes);
+    HRESULT hr = desktopDupl->AcquireNextFrame(16, &frameInfo, &desktopRes);
     if (hr == DXGI_ERROR_WAIT_TIMEOUT)
     {
         // No new frame, just draw last frame if we have it

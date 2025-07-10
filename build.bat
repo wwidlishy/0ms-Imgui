@@ -9,7 +9,7 @@ if exist %appname% (
 )
 
 @REM Uncomment this section to rebuild imgui and overlay base
-call rebuild_deps.bat
+@REM call rebuild_deps.bat
 
 echo Building Program...
 

@@ -73,6 +73,10 @@ namespace OSImGui
         if (g_mainRenderTargetView) { g_mainRenderTargetView->Release(); g_mainRenderTargetView = NULL; }
     }
 }
+
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
 // OSImGui External
 namespace OSImGui
 {
@@ -181,34 +185,34 @@ bool DesktopCaptureAndDrawToImGui(ID3D11Device* device, ID3D11DeviceContext* con
 
     if (!initialized)
     {
-        IDXGIDevice* dxgiDevice = nullptr;
-        device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+        ComPtr<IDXGIDevice> dxgiDevice;
+        if (FAILED(device->QueryInterface(IID_PPV_ARGS(&dxgiDevice))))
+            return false;
 
-        IDXGIAdapter* adapter = nullptr;
-        dxgiDevice->GetAdapter(&adapter);
+        ComPtr<IDXGIAdapter> adapter;
+        if (FAILED(dxgiDevice->GetAdapter(&adapter)))
+            return false;
 
-        IDXGIOutput* output = nullptr;
-        adapter->EnumOutputs(0, &output);
+        ComPtr<IDXGIOutput> output;
+        if (FAILED(adapter->EnumOutputs(0, &output)))
+            return false;
 
-        IDXGIOutput1* output1 = nullptr;
-        output->QueryInterface(__uuidof(IDXGIOutput1), (void**)&output1);
-        output1->DuplicateOutput(device, &desktopDupl);
+        ComPtr<IDXGIOutput1> output1;
+        if (FAILED(output->QueryInterface(IID_PPV_ARGS(&output1))))
+            return false;
 
-        dxgiDevice->Release();
-        adapter->Release();
-        output->Release();
-        output1->Release();
+        if (FAILED(output1->DuplicateOutput(device, &desktopDupl)))
+            return false;
 
         initialized = true;
     }
 
-    DXGI_OUTDUPL_FRAME_INFO frameInfo;
-    IDXGIResource* desktopRes = nullptr;
-    HRESULT hr = desktopDupl->AcquireNextFrame(1, &frameInfo, &desktopRes);
+    DXGI_OUTDUPL_FRAME_INFO frameInfo = {};
+    ComPtr<IDXGIResource> desktopRes;
 
+    HRESULT hr = desktopDupl->AcquireNextFrame(1, &frameInfo, &desktopRes);
     if (FAILED(hr))
     {
-        // Could not get new frame - just draw last known texture (if any)
         if (srv)
         {
             ImGui::GetBackgroundDrawList()->AddImage(
@@ -218,22 +222,25 @@ bool DesktopCaptureAndDrawToImGui(ID3D11Device* device, ID3D11DeviceContext* con
             );
             return true;
         }
-        return false; // No frame ever captured
+        return false;
     }
 
-    ID3D11Texture2D* tex = nullptr;
-    desktopRes->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&tex);
-    desktopRes->Release();
+    ComPtr<ID3D11Texture2D> tex;
+    if (FAILED(desktopRes->QueryInterface(IID_PPV_ARGS(&tex))))
+    {
+        desktopDupl->ReleaseFrame();
+        return false;
+    }
 
-    D3D11_TEXTURE2D_DESC desc;
+    D3D11_TEXTURE2D_DESC desc = {};
     tex->GetDesc(&desc);
 
-    // Recreate texture & SRV if needed (size or format changed)
-    bool needRecreate = false;
-    if (!sharedTex)
-        needRecreate = true;
-    else if (desc.Width != lastDesc.Width || desc.Height != lastDesc.Height || desc.Format != lastDesc.Format)
-        needRecreate = true;
+    // Avoid unnecessary recreation
+    bool needRecreate =
+        !sharedTex ||
+        desc.Width != lastDesc.Width ||
+        desc.Height != lastDesc.Height ||
+        desc.Format != lastDesc.Format;
 
     if (needRecreate)
     {
@@ -245,21 +252,29 @@ bool DesktopCaptureAndDrawToImGui(ID3D11Device* device, ID3D11DeviceContext* con
         desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;
 
-        device->CreateTexture2D(&desc, nullptr, &sharedTex);
+        if (FAILED(device->CreateTexture2D(&desc, nullptr, &sharedTex)))
+        {
+            desktopDupl->ReleaseFrame();
+            return false;
+        }
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
         srvDesc.Format = desc.Format;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = 1;
-        device->CreateShaderResourceView(sharedTex, &srvDesc, &srv);
+
+        if (FAILED(device->CreateShaderResourceView(sharedTex, &srvDesc, &srv)))
+        {
+            sharedTex->Release();
+            sharedTex = nullptr;
+            desktopDupl->ReleaseFrame();
+            return false;
+        }
 
         lastDesc = desc;
     }
 
-    // Copy desktop frame into shared texture
-    context->CopyResource(sharedTex, tex);
-    tex->Release();
-
+    context->CopyResource(sharedTex, tex.Get());
     desktopDupl->ReleaseFrame();
 
     ImGui::GetBackgroundDrawList()->AddImage(
@@ -276,6 +291,7 @@ bool DesktopCaptureAndDrawToImGui(ID3D11Device* device, ID3D11DeviceContext* con
     void OSImGui_External::MainLoop()
     {
         SetWindowDisplayAffinity(Window.hWnd, WDA_EXCLUDEFROMCAPTURE);
+
         while (!EndFlag)
         {
             if (PeekEndMessage())
